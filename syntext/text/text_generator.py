@@ -1,4 +1,3 @@
-from syntext.policy import TextGeneratorPoliy
 import random
 
 class TextGenerator():

@@ -2,7 +2,7 @@ import time,random
 from syntext.text.text_generator import TextGenerator
 
 class DateGenerator(TextGenerator):
-    def __init__(self):
+    def __init__(self, charset):
         super().__init__("date")
 
     def generate(self):

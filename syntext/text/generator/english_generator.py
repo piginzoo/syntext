@@ -3,8 +3,9 @@ import numpy as np
 import random
 
 class DateGenerator(TextGenerator):
-    def __init__(self):
-        pass
+    def __init__(self, charset):
+        super().__init__("english")
+
     def generate(self,):
 
         alphabeta = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW"

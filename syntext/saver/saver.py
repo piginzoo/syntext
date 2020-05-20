@@ -40,6 +40,10 @@ class Saver():
 ```
 """
 class ContourSaver(Saver):
+
+    def __init__(self,conf):
+        self.conf = conf
+
     def _bbox2str(self,bbox):
         return ""
 

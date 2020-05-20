@@ -1,4 +1,6 @@
 import numpy as np
+from syntext.utils.utils import dynamic_load
+from syntext.text.text_generator import TextGenerator
 
 class TextCreator():
     def __init__(self):
@@ -22,8 +24,11 @@ class TextCreator():
 # - 增加变形后，上下会有
 """
 class RandomTextGenerator(TextCreator):
-    def __init__(self):
-        self.generaters = self._dynamic_load_generators()
+    def __init__(self, config, charset):
+        self.generaters = []
+        classes = dynamic_load("syntext.text.generator",TextGenerator)
+        for clazz in classes:
+            self.generaters.append(clazz(charset))
 
     def _normalize_policy(self,policy):
         policy_names = []

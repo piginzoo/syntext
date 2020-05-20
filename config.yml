@@ -1,8 +1,14 @@
-WORKER : 10             # 多少个进程同时生成图片
-TYPE : contour          # 带轮廓的生成器
+COMMON:
+    WORKER : 10             # 多少个进程同时生成图片
+    TYPE : contour          # 带轮廓的生成器
 
-MAX_LENGTH : 20   		# 可能的最大长度（字符数）
-MIN_LENGTH : 1    		# 可能的最小长度（字符数）
+RESOURCE :
+    FONT_DIR: data/fonts
+    BACKGROUND_DIR: data/backgrounds
+    CHARSET: data/charset.txt
+
+MAX_LENGTH : 20         # 可能的最大长度（字符数）
+MIN_LENGTH : 1          # 可能的最小长度（字符数）
 MAX_FONT_SIZE : 28      # 最大的字体
 MIN_FONT_SIZE : 18      # 最小的字体号
 MAX_LINE_HEIGHT: 100    # 最大的高度（像素）
@@ -24,9 +30,9 @@ MIN_BACKGROUND_HEIGHT : 800
 
 MAX_SPECIAL_NUM : 5 # 特殊字符的个数
 
-MAX_BLANK_NUM : 5 		# 字之间随机的空格数量
-MIN_BLANK_WIDTH : 50 	# 最小的句子间的随机距离
-MAX_BLANK_WIDTH : 100 	# 最长的句子间距离
+MAX_BLANK_NUM : 5         # 字之间随机的空格数量
+MIN_BLANK_WIDTH : 50     # 最小的句子间的随机距离
+MAX_BLANK_WIDTH : 100     # 最长的句子间距离
 
 INTERFER_LINE_NUM : 10
 INTERFER_POINT_NUM : 2000
@@ -40,11 +46,11 @@ MAX_EDGE_HEIGHT : 3 # 切边的最大高度
 
 
 # 各种可能性的概率
-POSSIBILITY_BLANK : 0.8     	# 有空格的概率
-POSSIBILITY_ROTOATE : 0.4   	# 文字的旋转
-POSSIBILITY_INTEFER : 0.2   	# 需要被干扰的图片，包括干扰线和点
-POSSIBILITY_WORD_INTEFER : 0.1 	# 需要被干扰的图片，包括干扰线和点
-POSSIBILITY_AFFINE  : 0.3   	# 需要被做仿射的文字
+POSSIBILITY_BLANK : 0.8         # 有空格的概率
+POSSIBILITY_ROTOATE : 0.4       # 文字的旋转
+POSSIBILITY_INTEFER : 0.2       # 需要被干扰的图片，包括干扰线和点
+POSSIBILITY_WORD_INTEFER : 0.1  # 需要被干扰的图片，包括干扰线和点
+POSSIBILITY_AFFINE  : 0.3       # 需要被做仿射的文字
 
 POSSIBILITY_TEXT:
     POSSIBILITY_PURE_NUM : 0.2  # 需要产生的纯数字

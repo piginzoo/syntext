@@ -3,7 +3,7 @@ from syntext.text.text_generator import TextGenerator
 
 class DateGenerator(TextGenerator):
     def __init__(self, charset):
-        super().__init__("date")
+        super().__init__("normal")
         self.charset = charset
 
     def generate(self):
