@@ -1,13 +1,13 @@
 import time,random
-from syntext.text.text_generator import TextGenerator
+from syntext.text.generator import TextGenerator
 
 class DateGenerator(TextGenerator):
-    def __init__(self, charset):
-        super().__init__("normal")
+    def __init__(self, config, charset):
+        super().__init__("normal", config)
         self.charset = charset
 
     def generate(self):
-        length = random.randint(MIN_LENGTH, MAX_LENGTH)
+        length = random.randint(self.config.MIN_LENGTH, self.config.MAX_LENGTH)
         s = ""
         for i in range(length):
             j = random.randint(0, len(self.charset) - 1)

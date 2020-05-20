@@ -14,5 +14,5 @@ class Augumentor():
     def __init__(self, conf):
         self.conf = conf
 
-    def augument(self, image):
-        return image
+    def augument(self, image,pos):
+        return image,pos

@@ -1,17 +1,18 @@
-from syntext.text.text_generator import TextGenerator
+from syntext.text.generator import TextGenerator
 import numpy as np
 import random
 
 class DateGenerator(TextGenerator):
-    def __init__(self, charset):
-        super().__init__("english")
+    def __init__(self, config, charset):
+        super().__init__("english",config)
+        self.charset = charset
 
     def generate(self,):
 
         alphabeta = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW"
         num = "0123456789"
         s = ""
-        length = random.randint(MIN_LENGTH, MAX_LENGTH)
+        length = random.randint(self.config.MIN_LENGTH, self.config.MAX_LENGTH)
 
         # if POSSIBILITY_PURE_ENG
         # E:english N:num C:Chinese
@@ -32,7 +33,7 @@ class DateGenerator(TextGenerator):
             return english
 
         snum = sample(num, length)
-        chinese = sample(charactors, length)
+        chinese = sample(self.charset, length)
 
         if opt == "EN":
             all = list(english + snum)

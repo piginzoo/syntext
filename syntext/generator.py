@@ -3,15 +3,16 @@ import os,random
 import numpy as np
 
 class Generator():
-    def __init__(self, config, charset, fonts, backgrounds):
+    def __init__(self, config, charset, fonts, backgrounds, saver):
         self.config = config
         self.worker = config.COMMON['WORKER']
         self.charset = charset
         self.fonts = fonts
         self.backgrounds = backgrounds
+        self.saver = saver
 
     # 因为英文、数字、符号等ascii可见字符宽度短，所以要计算一下他的实际宽度，便于做样本的时候的宽度过宽
-    def _caculate_text_shape(text, font):
+    def _caculate_text_shape(self, text, font):
         # 获得文件的大小,font.getsize计算的比较准
         width, height = font.getsize(text)
         return width, height
@@ -28,7 +29,7 @@ class Generator():
 
     def choose_font(self):
         font_color = self._get_random_color()
-        return random.choice(self.backgrounds),font_color
+        return random.choice(self.fonts),font_color
 
     # 生成一张图片
     def choose_backgournd(self, width, height):
@@ -53,8 +54,9 @@ class Generator():
         pass
 
     def _create_image(self,queue,num):
-        image, data = self.create_image(num)
-        queue.put({'image':image, 'data':data})
+        for i in range(num):
+            image, label = self.create_image()
+            queue.put({'image':image, 'label':label})
 
     def _save_label(self, queue, total_num):
         counter = 0
@@ -73,6 +75,8 @@ class Generator():
                         continue
                 self.saver.save(image,label)
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 print("样本保存发生错误，忽略此错误，继续....", str(e))
 
     def create_image(self,num):

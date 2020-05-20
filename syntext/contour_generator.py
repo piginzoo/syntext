@@ -1,6 +1,6 @@
 from syntext.generator import Generator
 from syntext.saver.saver import ContourSaver
-from syntext.text.text_creator import RandomTextGenerator
+from syntext.text.manager import RandomTextGenerator
 from syntext.augment.augmentor import Augumentor
 from PIL import Image, ImageDraw
 import random
@@ -11,11 +11,10 @@ import random
 """
 class ContourGenerator(Generator):
 
-    def __init__(self, config, charset, fonts, backgrounds):
+    def __init__(self, config, charset, fonts, backgrounds,saver):
 
         super().__init__(config, charset, fonts, backgrounds)
         self.text_creator = RandomTextGenerator(config, charset)
-        self.saver = ContourSaver(config)
         self.augmentor = Augumentor(config)
 
     # 计算每个非空格字符的位置(每个字符使用4点坐标标记位置)
@@ -37,7 +36,7 @@ class ContourGenerator(Generator):
             offset += w
         return pos
 
-    def create_image(self,):
+    def create_image(self):
 
         text = self.text_creator.generate()
         font,color = self.choose_font()
@@ -50,7 +49,7 @@ class ContourGenerator(Generator):
         draw = ImageDraw.Draw(image)
         draw.text((0, 0), text, fill=color, font=font)
 
-        image, label_data = self.augmentor.augument(image)
+        image, label_data = self.augmentor.augument(image,pos)
 
         background.paste(image, (0, 0), image)
 

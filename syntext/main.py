@@ -1,4 +1,5 @@
 from syntext.contour_generator import ContourGenerator
+from syntext.saver.saver import ContourSaver
 from PIL import Image, ImageFont
 from syntext.config import Config
 import numpy as np
@@ -47,6 +48,14 @@ def __load_charset(charset_file):
         charset.append(" ")
     return charset
 
+def build_generator(config, charset, fonts, backgrounds):
+    if config.COMMON['SAVER']:
+        saver = ContourSaver(config)
+
+    if config.COMMON['TEXT_GENERATOR']:
+        text_generator = ContourGenerator(config, charset, fonts, backgrounds,saver)
+
+    return text_generator
 
 if __name__=="__main__":
 
@@ -62,6 +71,6 @@ if __name__=="__main__":
     backgrounds = __load_background(config.RESOURCE['BACKGROUND_DIR'])
     charset = __load_charset(config.RESOURCE['CHARSET'])
 
-    generator = ContourGenerator(config, charset, fonts, backgrounds)
+    generator = build_generator(config, charset, fonts, backgrounds)
 
-    generator.execute(num=args.num)
+    generator.execute(total_num=args.num)
