@@ -1,7 +1,7 @@
 from multiprocessing import Process, Queue
 import os, random
 import numpy as np
-import cv2
+from syntext.utils.utils import debug_save_image
 
 
 class Generator():
@@ -65,6 +65,8 @@ class Generator():
             image, label = self.create_image()
 
             self.save_image(image, image_path)
+
+            debug_save_image(image_name, image, label)
 
             queue.put({'image': image_path, 'label': label})
 

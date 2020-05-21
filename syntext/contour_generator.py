@@ -2,7 +2,7 @@ from syntext.generator import Generator
 from syntext.text.manager import RandomTextGenerator
 from syntext.augment.augmentor import Augumentor
 from PIL import Image, ImageDraw
-
+from syntext.utils.utils import debug
 
 class ContourGenerator(Generator):
     """
@@ -66,16 +66,18 @@ class ContourGenerator(Generator):
     #   ]
     # }
     def build_label_data(self, text, char_bboxes):
+        debug("char_bboxes:%r", char_bboxes)
         data = {}
         data['label'] = text
         data['pos'] = []
         for i,char in enumerate(text):
             if char == " ": continue # 空格不标注的
-            # print(char_bboxes[i])
+            debug("char_bboxes[i]:%r", char_bboxes[i])
             pos = {
                 'word': char,
                 'bbox': char_bboxes[i]
             }
             data['pos'].append(pos)
+            debug("pos:%r", pos)
 
         return data

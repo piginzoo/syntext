@@ -57,7 +57,7 @@ class RandomTextGenerator(TextCreator):
         policy_probabilities = []
 
         sum = 0
-        print(policy)
+
         for name, value in policy.items():
             policy_names.append(name)
             policy_probabilities.append(value)

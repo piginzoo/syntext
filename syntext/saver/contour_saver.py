@@ -2,7 +2,6 @@ from syntext.saver.saver import Saver
 import numpy as np
 import os
 
-
 class ContourSaver(Saver):
     """
     标注文件样例：
@@ -41,7 +40,8 @@ class ContourSaver(Saver):
     #
     # pos:{'word':'你',bbox:<4,2>}
     def _bbox2str(self, pos):
-        # print(pos)
+        import logging
+
         word = pos['word']
         bbox = pos['bbox']  # [4,2]
 
@@ -49,13 +49,14 @@ class ContourSaver(Saver):
 
         assert bbox.shape == (4, 2)
 
-        bbox_list = np.reshape(-1,1).tolist()
+        bbox_list = bbox.reshape(-1).tolist()
+        logging.debug("bbox:%r", bbox_list)
+
         bbox_list = ",".join(str(p) for p in bbox_list)
 
         return bbox_list + "," + word
 
     def get_label_name(self, image_path):
-        print(image_path)
         name, ext = os.path.splitext(image_path)
         label_file_path = name + ".txt"
         return label_file_path

@@ -49,7 +49,7 @@ MAX_EDGE_HEIGHT : 3             # 切边的最大高度
 
 
 # 各种可能性的概率
-POSSIBILITY_BLANK : 0.8         # 有空格的概率
+POSSIBILITY_BLANK : 1         # 有空格的概率
 POSSIBILITY_ROTOATE : 0.4       # 文字的旋转
 POSSIBILITY_INTEFER : 0.2       # 需要被干扰的图片，包括干扰线和点
 POSSIBILITY_WORD_INTEFER : 0.1  # 需要被干扰的图片，包括干扰线和点

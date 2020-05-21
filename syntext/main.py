@@ -62,6 +62,11 @@ def build_generator(config, charset, fonts, backgrounds):
 
 if __name__ == "__main__":
 
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d行 %(message)s"
+    )
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir")
     parser.add_argument("--num", type=int)
