@@ -1,6 +1,8 @@
-from multiprocessing import Process,Queue
-import os,random
+from multiprocessing import Process, Queue
+import os, random
 import numpy as np
+import cv2
+
 
 class Generator():
     def __init__(self, config, charset, fonts, backgrounds, saver):
@@ -29,7 +31,7 @@ class Generator():
 
     def choose_font(self):
         font_color = self._get_random_color()
-        return random.choice(self.fonts),font_color
+        return random.choice(self.fonts), font_color
 
     # 生成一张图片
     def choose_backgournd(self, width, height):
@@ -53,10 +55,18 @@ class Generator():
     def charset(self):
         pass
 
-    def _create_image(self,queue,num):
+    def save_image(self, image, path):
+        image.save(path)
+
+    def _create_image(self, id, queue, num, dir):
         for i in range(num):
+            image_name = f"{id}-{i}.png"
+            image_path = os.path.join(dir, image_name)
             image, label = self.create_image()
-            queue.put({'image':image, 'label':label})
+
+            self.save_image(image, image_path)
+
+            queue.put({'image': image_path, 'label': label})
 
     def _save_label(self, queue, total_num):
         counter = 0
@@ -73,28 +83,28 @@ class Generator():
                         break
                     else:
                         continue
-                self.saver.save(image,label)
+                self.saver.save(image, label)
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 print("样本保存发生错误，忽略此错误，继续....", str(e))
 
-    def create_image(self,num):
+    def create_image(self, num):
         raise NotImplementedError("需要子类化")
 
-    def save_label(self,label_data):
+    def save_label(self, label_data):
         raise NotImplementedError("需要子类化")
 
-    def execute(self,total_num):
+    def execute(self, total_num, dir):
         producers = []
         queue = Queue()
-        num = total_num//self.worker
-        for i in range(self.worker):
-            p = Process(target=self._create_image, args=(queue,num,))
+        num = total_num // self.worker
+        for id in range(self.worker):
+            p = Process(target=self._create_image, args=(id, queue, num, dir))
             producers.append(p)
             p.start()
 
-        consumer = Process(target=self._save_label, args=(queue,total_num))
+        consumer = Process(target=self._save_label, args=(queue, total_num))
         consumer.start()
 
         print("样本生成完成")
