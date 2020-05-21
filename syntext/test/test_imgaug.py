@@ -9,7 +9,6 @@ def do_aug(image, aug):
         aug
     ])
 
-
     # seq_det = seq.to_deterministic()  # 保持坐标和图像同步改变，而不是随机
     # bbox的测试
     # bbs = ia.BoundingBoxesOnImage(
