@@ -14,7 +14,7 @@ class BlankProcessor(PostProcessor):
         if utils.is_number(text) or utils.is_date(text):
             return self._generate_blanks_only_head_tail(text)
 
-        self._generate_blanks_at_random_pos(text)
+        return self._generate_blanks_at_random_pos(text)
 
     # 只在头尾加入空格
     def _generate_blanks_only_head_tail(self, chars):

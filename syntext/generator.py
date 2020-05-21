@@ -1,7 +1,11 @@
-from multiprocessing import Process, Queue
-import os, random
-import numpy as np
 from syntext.utils.utils import debug_save_image
+from multiprocessing import Process, Queue
+from PIL import Image, ImageDraw
+import numpy as np
+import os, random
+import traceback
+import time
+import sys
 
 
 class Generator():
@@ -19,6 +23,26 @@ class Generator():
         width, height = font.getsize(text)
         return width, height
 
+        # 计算每个非空格字符的位置(每个字符使用4点坐标标记位置)
+
+    def _caculate_position(self, text, font):
+        char_bboxes = []
+        offset = 0
+        for c in text:
+            w, h = font.getsize(c)
+            if c == " ":
+                offset += w
+                continue
+            char_char_bbox = [
+                [offset, 0],
+                [offset + w, 0],
+                [offset + w, h],
+                [offset, h]
+            ]
+            char_bboxes.append(char_char_bbox)
+            offset += w
+        return char_bboxes
+
     # 产生随机颜色, 各通道小于
     def _get_random_color(self):
         base_color = random.randint(0, 128)
@@ -29,12 +53,12 @@ class Generator():
         font_color = (np.array(base_color) + noise).tolist()
         return tuple(font_color)
 
-    def choose_font(self):
+    def _choose_font(self):
         font_color = self._get_random_color()
         return random.choice(self.fonts), font_color
 
     # 生成一张图片
-    def choose_backgournd(self, width, height):
+    def _choose_backgournd(self, width, height):
         bground = random.choice(self.backgrounds)
         x = random.randint(0, bground.size[0] - width)
         y = random.randint(0, bground.size[1] - height)
@@ -59,16 +83,23 @@ class Generator():
         image.save(path)
 
     def _create_image(self, id, queue, num, dir):
+
         for i in range(num):
-            image_name = f"{id}-{i}.png"
-            image_path = os.path.join(dir, image_name)
-            image, label = self.create_image()
+            try:
+                image_name = f"{id}-{i}.png"
+                image_path = os.path.join(dir, image_name)
+                image, label = self.create_image()
 
-            self.save_image(image, image_path)
+                self.save_image(image, image_path)
 
-            debug_save_image(image_name, image, label)
+                debug_save_image(image_name, image, label)
 
-            queue.put({'image': image_path, 'label': label})
+                queue.put({'image': image_path, 'label': label})
+            except Exception as e:
+                traceback.print_exc()
+                print("[#%d-%d]样本生成发生错误，忽略此错误[%s]，继续...." % (id, i, str(e)))
+
+        print("生成进程[%d]生成完毕，合计[%d]张" % (id, num))
 
     def _save_label(self, queue, total_num):
         counter = 0
@@ -78,21 +109,40 @@ class Generator():
                 image = data['image']
                 label = data['label']
 
-                if image is None:
-                    counter += 1
-                    if counter >= total_num:
-                        print("完成了所有的样本生成")
-                        break
-                    else:
-                        continue
                 self.saver.save(image, label)
+                counter += 1
+
+                if counter >= total_num:
+                    print("完成了所有的样本生成")
+                    break
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 print("样本保存发生错误，忽略此错误，继续....", str(e))
 
-    def create_image(self, num):
-        raise NotImplementedError("需要子类化")
+    # 子类可能会重载
+    def build_label_data(self, text, char_bboxes):
+        return text
+
+    def create_image(self):
+
+        text = self.text_creator.generate()
+        font, color = self._choose_font()
+        char_bboxes = self._caculate_position(text, font)
+        width, height = self._caculate_text_shape(text, font)
+        background = self._choose_backgournd(width, height)
+
+        image = Image.new('RGBA', (width, height))
+        draw = ImageDraw.Draw(image)
+        draw.text((0, 0), text, fill=color, font=font)
+
+        image, char_bboxes = self.augmentor.augument(image, char_bboxes)
+
+        background.paste(image, (0, 0), image)
+
+        label_data = self.build_label_data(text, char_bboxes)
+
+        return background, label_data
 
     def save_label(self, label_data):
         raise NotImplementedError("需要子类化")
@@ -100,13 +150,29 @@ class Generator():
     def execute(self, total_num, dir):
         producers = []
         queue = Queue()
+
+        consumer = Process(target=self._save_label, args=(queue, total_num))
+        consumer.start()
+
         num = total_num // self.worker
         for id in range(self.worker):
             p = Process(target=self._create_image, args=(id, queue, num, dir))
             producers.append(p)
             p.start()
+            p.join()
 
-        consumer = Process(target=self._save_label, args=(queue, total_num))
-        consumer.start()
+        print("生成进程全部运行完毕，等待写入进程工作...")
+        timeout = 0
+        while True:
+            if not consumer.is_alive(): break
+            if timeout > 30:
+                print("超时30秒退出")
+                consumer.terminate()
+                break
 
-        print("样本生成完成")
+            time.sleep(1)
+            timeout += 1
+            print(".", end='')
+            sys.stdout.flush()
+
+        print("!!! 样本生成完成，合计[%d]张" % total_num)

@@ -2,6 +2,7 @@ from syntext.saver.saver import Saver
 import numpy as np
 import os
 
+
 class ContourSaver(Saver):
     """
     标注文件样例：

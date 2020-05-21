@@ -52,19 +52,19 @@ class RandomTextGenerator(TextCreator):
             self.post_processors[obj.name] = obj
 
 
-    def _normalize_policy(self, policy):
-        policy_names = []
-        policy_probabilities = []
+    def _normalize_possibility(self, possibility):
+        possibility_names = []
+        possibility_probabilities = []
 
         sum = 0
 
-        for name, value in policy.items():
-            policy_names.append(name)
-            policy_probabilities.append(value)
+        for name, value in possibility.items():
+            possibility_names.append(name)
+            possibility_probabilities.append(value)
             sum += value
-        policy_probabilities = [p / sum for p in policy_probabilities]
+        possibility_probabilities = [p / sum for p in possibility_probabilities]
 
-        return policy_names, policy_probabilities
+        return possibility_names, possibility_probabilities
 
     # 只在头尾加入空格
     def _generate_blanks_only_head_tail(self, chars):
@@ -76,10 +76,13 @@ class RandomTextGenerator(TextCreator):
     def generate(self):
         policy = self.config.POSSIBILITY_TEXT  # POSSIBILITY_TEXT是用于生成
         # 归一化一下
-        policy_names, policy_probabilities = self._normalize_policy(policy)
+        policy_names, policy_probabilities = self._normalize_possibility(policy)
         generator_name = np.random.choice(policy_names, p=policy_probabilities)
         generator = self.generaters[generator_name]
         text = generator.generate()
+
+        for _,post_processor in self.post_processors.items():
+            text = post_processor.process(text)
 
         return text
 

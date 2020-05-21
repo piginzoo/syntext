@@ -1,6 +1,3 @@
-import os
-
-
 class Saver:
 
     def parse_lines(self, image_path, label):

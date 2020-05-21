@@ -9,5 +9,5 @@ class PostProcessor():
     def process(self,text):
         raise NotImplementedError("子类实现")
 
-    def is_accept(possible):
+    def is_accept(self,possible):
         return np.random.choice([True,False], p = [possible,1 - possible])

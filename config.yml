@@ -1,5 +1,5 @@
 COMMON:
-    WORKER : 1                  # 多少个进程同时生成图片
+    WORKER : 3                  # 多少个进程同时生成图片
     TEXT_GENERATOR : random     # 随机生成，支持随机和按照语料生成
     SAVER : contour             # 保存轮廓的
 
@@ -49,14 +49,16 @@ MAX_EDGE_HEIGHT : 3             # 切边的最大高度
 
 
 # 各种可能性的概率
-POSSIBILITY_BLANK : 1         # 有空格的概率
+POSSIBILITY_BLANK : 1           # 有空格的概率
+POSSIBILITY_SPECIAL : 1         # 插入一些特殊字符的概率
 POSSIBILITY_ROTOATE : 0.4       # 文字的旋转
 POSSIBILITY_INTEFER : 0.2       # 需要被干扰的图片，包括干扰线和点
 POSSIBILITY_WORD_INTEFER : 0.1  # 需要被干扰的图片，包括干扰线和点
 POSSIBILITY_AFFINE  : 0.3       # 需要被做仿射的文字
 
 POSSIBILITY_TEXT:
-    number : 0.2                # 需要产生的纯数字
-    english : 0.1               # 需要产生的英语
-    date : 0.1                  # 需要产生的纯日期
+    normal : 1                # 最普通的情况（汉字+数字+英文+符号）
+    number : 0                # 需要产生的纯数字
+    english : 0               # 需要产生的英语
+    date : 0                  # 需要产生的纯日期
 #    single : 0.01               # 单字的比例
