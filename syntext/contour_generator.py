@@ -1,7 +1,6 @@
 from syntext.generator import Generator
 from syntext.text.manager import RandomTextGenerator
-from syntext.augment.augmentor import Augumentor
-from PIL import Image, ImageDraw
+from syntext.augmentor import Augumentor
 from syntext.utils.utils import debug
 
 
