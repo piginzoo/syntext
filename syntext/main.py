@@ -21,7 +21,7 @@ def __load_background(bground_dir):
             image = image.convert("RGB")
         bground_list.append(image)
         logger.debug("    加载背景图片：%s", full_path)
-    logger.debug("所有图片加载完毕")
+    logger.info("所有背景图片加载完毕[%d]张", len(bground_list))
 
     return bground_list
 
@@ -37,6 +37,7 @@ def __load_fonts(conf):
         for size in font_sizes:
             font = ImageFont.truetype(font_name, size)
             fonts.append(font)
+    logger.info("所有字体加载完毕[%d]个", len(fonts))
     return fonts
 
 
@@ -45,8 +46,7 @@ def __load_charset(charset_file):
     charset = [ch.strip("\n") for ch in charset]
     charset = "".join(charset)
     charset = list(charset)
-    if charset[-1] != " ":
-        charset.append(" ")
+    logger.info("所有字库加载完毕[%d]个", len(charset))
     return charset
 
 
@@ -62,15 +62,20 @@ def build_generator(config, charset, fonts, backgrounds):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d行 %(message)s"
-    )
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--debug", default=False, action='store_true')
     parser.add_argument("--dir")
     parser.add_argument("--num", type=int)
     args = parser.parse_args()
+
+    print(args.debug)
+    level = logging.INFO
+    if args.debug: level = logging.DEBUG
+    logging.basicConfig(
+        level=level,
+        format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d行 %(message)s"
+    )
 
     if not os.path.exists(args.dir): os.mkdir(args.dir)
 

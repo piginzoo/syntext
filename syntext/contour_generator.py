@@ -15,10 +15,6 @@ class ContourGenerator(Generator):
         self.text_creator = RandomTextGenerator(config, charset)
         self.augmentor = Augumentor(config)
 
-
-
-
-
     # {
     #   "label":"你好世界！",
     #   "pos":[

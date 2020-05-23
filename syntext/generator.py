@@ -1,11 +1,16 @@
 from syntext.utils.utils import debug_save_image
 from multiprocessing import Process, Queue
+from syntext.augmentor import Augumentor
 from PIL import Image, ImageDraw
 import numpy as np
 import os, random
 import traceback
+import logging
 import time
 import sys
+import cv2
+
+logger = logging.getLogger(__name__)
 
 
 class Generator():
@@ -16,14 +21,13 @@ class Generator():
         self.fonts = fonts
         self.backgrounds = backgrounds
         self.saver = saver
+        self.augmentor = Augumentor(config)
 
     # 因为英文、数字、符号等ascii可见字符宽度短，所以要计算一下他的实际宽度，便于做样本的时候的宽度过宽
     def _caculate_text_shape(self, text, font):
         # 获得文件的大小,font.getsize计算的比较准
         width, height = font.getsize(text)
         return width, height
-
-        # 计算每个非空格字符的位置(每个字符使用4点坐标标记位置)
 
     def _caculate_position(self, text, font):
         char_bboxes = []
@@ -80,7 +84,7 @@ class Generator():
         pass
 
     def save_image(self, image, path):
-        image.save(path)
+        cv2.imwrite(path, image)
 
     def _create_image(self, id, queue, num, dir):
 
@@ -88,18 +92,18 @@ class Generator():
             try:
                 image_name = f"{id}-{i}.png"
                 image_path = os.path.join(dir, image_name)
-                image, label = self.create_image()
-
+                image, text, bboxes = self.create_image()
+                image = self._pil2cv2(image)
+                image, bboxes = self.augmentor.augument(image, bboxes)
+                label_data = self.build_label_data(text, bboxes)
                 self.save_image(image, image_path)
-
-                debug_save_image(image_name, image, label)
-
-                queue.put({'image': image_path, 'label': label})
+                debug_save_image(image_name, image, label_data)
+                queue.put({'image': image_path, 'label': label_data})
             except Exception as e:
                 traceback.print_exc()
-                print("[#%d-%d]样本生成发生错误，忽略此错误[%s]，继续...." % (id, i, str(e)))
+                logger.error("[#%d-%d]样本生成发生错误，忽略此错误[%s]，继续...." % (id, i, str(e)))
 
-        print("生成进程[%d]生成完毕，合计[%d]张" % (id, num))
+        logger.info("生成进程[%d]生成完毕，合计[%d]张" % (id, num))
 
     def _save_label(self, queue, total_num):
         counter = 0
@@ -113,36 +117,38 @@ class Generator():
                 counter += 1
 
                 if counter >= total_num:
-                    print("完成了所有的样本生成")
+                    logger.info("完成了所有的样本生成")
                     break
             except Exception as e:
                 import traceback
                 traceback.print_exc()
-                print("样本保存发生错误，忽略此错误，继续....", str(e))
+                logger.error("样本保存发生错误，忽略此错误，继续....", str(e))
 
     # 子类可能会重载
     def build_label_data(self, text, char_bboxes):
         return text
 
+    def _pil2cv2(self, image):
+        # PIL图像转成cv2
+        image = image.convert('RGB')
+        image = np.array(image)
+        image = image[:, :, ::-1]
+        return image
+
     def create_image(self):
 
         text = self.text_creator.generate()
         font, color = self._choose_font()
-        char_bboxes = self._caculate_position(text, font)
+        bboxes = self._caculate_position(text, font)
         width, height = self._caculate_text_shape(text, font)
         background = self._choose_backgournd(width, height)
 
         image = Image.new('RGBA', (width, height))
         draw = ImageDraw.Draw(image)
         draw.text((0, 0), text, fill=color, font=font)
-
-        image, char_bboxes = self.augmentor.augument(image, char_bboxes)
-
         background.paste(image, (0, 0), image)
 
-        label_data = self.build_label_data(text, char_bboxes)
-
-        return background, label_data
+        return background, text, bboxes
 
     def save_label(self, label_data):
         raise NotImplementedError("需要子类化")
@@ -161,12 +167,12 @@ class Generator():
             p.start()
             p.join()
 
-        print("生成进程全部运行完毕，等待写入进程工作...")
+        logger.info("生成进程全部运行完毕，等待写入进程工作...")
         timeout = 0
         while True:
             if not consumer.is_alive(): break
             if timeout > 30:
-                print("超时30秒退出")
+                logger.warning("超时30秒退出")
                 consumer.terminate()
                 break
 
@@ -175,4 +181,4 @@ class Generator():
             print(".", end='')
             sys.stdout.flush()
 
-        print("!!! 样本生成完成，合计[%d]张" % total_num)
+        logger.info("!!! 样本生成完成，合计[%d]张" % total_num)

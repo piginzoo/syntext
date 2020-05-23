@@ -3,6 +3,7 @@ import importlib
 import inspect
 import datetime
 import logging
+import cv2
 
 date_formatter = [
     "%Y-%m-%d",
@@ -54,8 +55,6 @@ def debug_save_image(name, image, label):
         os.makedirs(debug_dir)
     debug_image_path = os.path.join(debug_dir, name)
 
-    draw = ImageDraw.Draw(image)
-
     # {
     #   "label":"你好世界！",
     #   "pos":[
@@ -69,9 +68,8 @@ def debug_save_image(name, image, label):
     if type(label)==dict and "pos" in label:
         for pos in label['pos']:
             bboxes = pos['bbox']
-            bboxes = [(x[0],x[1]) for x in bboxes ]
-            draw.polygon(bboxes,outline="red")
-        image.save(debug_image_path)
+            cv2.polylines(image, bboxes, isClosed=True, color="red")
+        cv2.imwrite(debug_image_path,image)
 
 
 def dynamic_load(module_name, parent_class):
