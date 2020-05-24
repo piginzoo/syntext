@@ -1,7 +1,7 @@
 COMMON:
     WORKER : 3                  # 多少个进程同时生成图片
-    TEXT_GENERATOR : random     # 随机生成，支持随机和按照语料生成
-    SAVER : contour             # 保存轮廓的
+    TEXT_GENERATOR : random     # 随机生成:random, 语料生成:corpus
+    SAVER : contour             # 保存轮廓的:contour, 只保存标签: text
 
 
 RESOURCE :
@@ -18,7 +18,7 @@ MAX_LINE_HEIGHT: 100            # 最大的高度（像素）
 MIN_LINE_HEIGHT:  12            # 最小的高度（像素）
 
 # 颜色的算法是，产生一个基准，然后RGB上下浮动FONT_COLOR_NOISE
-MAX_FONT_COLOR : 100            # 最大的可能颜色
+MAX_FONT_COLOR : 128            # 最大的可能颜色
 FONT_COLOR_NOISE : 10           # 最大的可能颜色
 ONE_CHARACTOR_WIDTH : 1024      # 一个字的宽度
 ROTATE_ANGLE : 4                # 随机旋转角度
@@ -32,7 +32,6 @@ MAX_BACKGROUND_HEIGHT : 900
 MIN_BACKGROUND_HEIGHT : 800
 
 MAX_SPECIAL_NUM : 5             # 特殊字符的个数
-
 MAX_BLANK_NUM : 5               # 字之间随机的空格数量
 MIN_BLANK_WIDTH : 50            # 最小的句子间的随机距离
 MAX_BLANK_WIDTH : 100           # 最长的句子间距离
@@ -46,7 +45,8 @@ INTERFER_WORD_LINE_WIGHT : 1
 
 MIN_EDGE_HEIGHT : 1             # 切边的最小高度
 MAX_EDGE_HEIGHT : 3             # 切边的最大高度
-
+TEXT_WIDTH_PAD : 50             # 文字的左右pad
+TEXT_HEIGHT_PAD : 10            # 文字的上下pad
 
 # 各种可能性的概率
 POSSIBILITY_BLANK : 1           # 有空格的概率

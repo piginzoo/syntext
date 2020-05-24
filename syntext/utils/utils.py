@@ -1,9 +1,12 @@
 from pkgutil import walk_packages
+import numpy as np
 import importlib
 import inspect
 import datetime
 import logging
 import cv2
+import os
+
 
 date_formatter = [
     "%Y-%m-%d",
@@ -42,9 +45,6 @@ def debug(*args):
     logging.debug(*args)
 
 
-import os
-import numpy as np
-from PIL import ImageDraw
 
 def debug_save_image(name, image, label):
     if not DEBUG: return
@@ -67,8 +67,8 @@ def debug_save_image(name, image, label):
     # }
     if type(label)==dict and "pos" in label:
         for pos in label['pos']:
-            bboxes = pos['bbox']
-            cv2.polylines(image, bboxes, isClosed=True, color="red")
+            bboxes = np.array(pos['bbox'])
+            cv2.polylines(image, [bboxes], isClosed=True, color=(0,0,255))
         cv2.imwrite(debug_image_path,image)
 
 

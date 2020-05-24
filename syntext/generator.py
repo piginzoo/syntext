@@ -1,7 +1,7 @@
 from syntext.utils.utils import debug_save_image
 from multiprocessing import Process, Queue
 from syntext.augmentor import Augumentor
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFile
 import numpy as np
 import os, random
 import traceback
@@ -12,6 +12,8 @@ import cv2
 
 logger = logging.getLogger(__name__)
 
+# 为了解决：image file is truncated (XX bytes not processed) 异常
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 class Generator():
     def __init__(self, config, charset, fonts, backgrounds, saver):
@@ -27,32 +29,32 @@ class Generator():
     def _caculate_text_shape(self, text, font):
         # 获得文件的大小,font.getsize计算的比较准
         width, height = font.getsize(text)
+
         return width, height
 
-    def _caculate_position(self, text, font):
+    def _caculate_position(self, text, font, x_offset, y_offset):
         char_bboxes = []
-        offset = 0
         for c in text:
             w, h = font.getsize(c)
             if c == " ":
-                offset += w
+                x_offset += w
                 continue
             char_char_bbox = [
-                [offset, 0],
-                [offset + w, 0],
-                [offset + w, h],
-                [offset, h]
+                [x_offset, y_offset],
+                [x_offset + w, y_offset],
+                [x_offset + w, h + y_offset],
+                [x_offset, h + y_offset]
             ]
             char_bboxes.append(char_char_bbox)
-            offset += w
+            x_offset += w
         return char_bboxes
 
-    # 产生随机颜色, 各通道小于
+    # 产生随机颜色
     def _get_random_color(self):
-        base_color = random.randint(0, 128)
-        noise_r = random.randint(0, 100)
-        noise_g = random.randint(0, 100)
-        noise_b = random.randint(0, 100)
+        base_color = random.randint(0, self.config.MAX_FONT_COLOR)
+        noise_r = random.randint(0, self.config.FONT_COLOR_NOISE)
+        noise_g = random.randint(0, self.config.FONT_COLOR_NOISE)
+        noise_b = random.randint(0, self.config.FONT_COLOR_NOISE)
         noise = np.array([noise_r, noise_g, noise_b])
         font_color = (np.array(base_color) + noise).tolist()
         return tuple(font_color)
@@ -61,22 +63,27 @@ class Generator():
         font_color = self._get_random_color()
         return random.choice(self.fonts), font_color
 
-    # 生成一张图片
+    # 从大背景图中，随机切出一个和字体大小相仿的一块，宽高加入一些随机扰动
     def _choose_backgournd(self, width, height):
+        # 宽高加入一些随机扰动
+        width = width + random.randint(0, self.config.TEXT_WIDTH_PAD)
+        height = height + random.randint(0, self.config.TEXT_HEIGHT_PAD)
+
         bground = random.choice(self.backgrounds)
         x = random.randint(0, bground.size[0] - width)
         y = random.randint(0, bground.size[1] - height)
         retry = 0
         while x < 0 or y < 0:
-            print("[ERROR] 这张图太小了，换一张")
+            logger.warning("背景图太小了，换一张")
             bground = random.choice(self.backgrounds)
             x = random.randint(0, bground.size[0] - width)
             y = random.randint(0, bground.size[1] - height)
             retry += 1
-            if retry >= 5:
-                print("[ERROR] 尝试5次，无法找到合适的背景，放弃")
+            if retry >= 3:
+                logger.warning("尝试3次，无法找到合适的背景，放弃")
                 return None
 
+        print((x, y, x + width, y + height))
         bground = bground.crop((x, y, x + width, y + height))
         return bground
 
@@ -139,14 +146,21 @@ class Generator():
 
         text = self.text_creator.generate()
         font, color = self._choose_font()
-        bboxes = self._caculate_position(text, font)
-        width, height = self._caculate_text_shape(text, font)
-        background = self._choose_backgournd(width, height)
 
+        width, height = self._caculate_text_shape(text, font)
         image = Image.new('RGBA', (width, height))
         draw = ImageDraw.Draw(image)
         draw.text((0, 0), text, fill=color, font=font)
-        background.paste(image, (0, 0), image)
+
+        # 把文字，贴到背景上，背景会稍微比文字区域大一些
+        background = self._choose_backgournd(width, height)
+        bg_width, bg_height = background.size
+        x = random.randint(0, (bg_width - width))
+        y = random.randint(0, (bg_height - height))
+        logger.debug("贴文字到背景的位置：(%d,%d)", x, y)
+        background.paste(image, (x, y), image)
+
+        bboxes = self._caculate_position(text, font, x, y)
 
         return background, text, bboxes
 
@@ -171,7 +185,7 @@ class Generator():
         timeout = 0
         while True:
             if not consumer.is_alive(): break
-            if timeout > 30:
+            if timeout > 3:
                 logger.warning("超时30秒退出")
                 consumer.terminate()
                 break

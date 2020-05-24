@@ -11,7 +11,7 @@ class SpecialProcessor(PostProcessor):
         if not self.is_accept(self.config.POSSIBILITY_SPECIAL): return s
 
         # logger.debug("原字符：%s",s)
-        specials = "|,.。-+/＊()"
+        specials = "!@#$%^&*()-_+={}[]|\<>,.。;:、?/'\"《》①②③④⑤⑥⑦⑧⑨⑩【】￥"
         num = random.randint(1,self.config.MAX_SPECIAL_NUM)
         for i in range(num):
             c = random.choice(specials)
