@@ -1,5 +1,5 @@
 from syntext.generator.generator import Generator
-
+import os
 
 class TextOnlyGenerator(Generator):
     """
@@ -11,11 +11,16 @@ class TextOnlyGenerator(Generator):
     ```
     """
 
-    def __init__(self, conf):
-        self.conf = conf
+    def __init__(self, config, charset, fonts, backgrounds, text_creator, augmentor):
+        super().__init__(config, charset, fonts, backgrounds, text_creator, augmentor)
+
+    def build_label_data(self, text, char_bboxes):
+        return text
 
     def get_label_name(self, image_path):
-        return "train.txt"
+        dir,_ = os.path.split(image_path)
+        label_file_path = os.path.join(dir, "train.txt")
+        return label_file_path
 
     def parse_lines(self, image_path, label):
-        return image_path + " " + label
+        return [image_path + " " + label]

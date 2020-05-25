@@ -186,7 +186,8 @@ class Generator():
         lines = self.parse_lines(image_path, label)
         label_file_name = self.get_label_name(image_path)
 
-        label_file = open(label_file_name, 'w', encoding='utf-8')
+        label_file = open(label_file_name, 'a', encoding='utf-8')
+
         for line in lines:
             label_file.write(line)
             label_file.write("\n")
