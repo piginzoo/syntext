@@ -2,6 +2,13 @@
 
 这个项目用于生成训练过程中的样本。
 
+实现了以下功能：
+- 可以基于字库随机生成，并且可以配置数字、日期、汉字、混英文等各自的生成概率
+- 可以基于语料生成，从语料中随机截取片段文字进行生成
+- 可以支持多种效果进行增强：变形、剪切、噪音、模糊等
+- 可以支持多种字体和多种背景（可定制）
+- 可以支持只产生文本样本，也支持带有每个字坐标标注的样本
+
 ## 参考
 
 此项目参考了以下的开源项目：
@@ -81,6 +88,7 @@ data/train/bcd.jpg 毁灭吧，世界！累了~
 
 # 使用
 
+## 运行程序
 运行[bin/run.sh](bin/run.sh)可以生成图像，格式如下：
 ```text
 bin/run.sh --dir output_dir --num number <--debug>
@@ -91,14 +99,37 @@ bin/run.sh --dir output_dir --num number <--debug>
 - num：生成多个张
 - debug：是否显示更多的运行信息
 
-其他的运行细节，需要配置[config.yml](config.yml)：
+## 配置
+
+为了控制运行细节，需要配置[config.yml](config.yml)：
+
+- 做随机生成
 ```text
 COMMON:
-    WORKER : 3                  # 多少个进程同时生成图片
     TEXT_GENERATOR : random     # 随机生成:random, 语料生成:corpus
-    SAVER : contour             # 保存轮廓的:contour, 只保存标签: text
 ```
-核心配置如上。
+
+- 基于语料生成
+```text
+COMMON:
+    TEXT_GENERATOR : corpus     # 随机生成:random, 语料生成:corpus
+```
+
+- 只生成文本
+```text
+COMMON:
+    GENERATOR : text         # 保存轮廓的:contour, 只保存标签: text
+```
+
+- 生成文本，和每个字的坐标
+```text
+COMMON:
+    GENERATOR : contour         # 保存轮廓的:contour, 只保存标签: text
+```
+
+以上配置都可以组合使用，更详细的配置，可直接参考配置文件中的注释。
+
+## 相关资源
 
 **运行前，需要先下载背景（各类白纸）和字体资源**：
 
