@@ -1,7 +1,7 @@
 COMMON:
     WORKER : 3                  # 多少个进程同时生成图片
-    TEXT_GENERATOR : random     # 随机生成:random, 语料生成:corpus
-    SAVER : contour             # 保存轮廓的:contour, 只保存标签: text
+    TEXT_CREATOR : random       # 随机生成:random, 语料生成:corpus
+    GENERATOR : contour         # 保存轮廓的:contour, 只保存标签: text
 
 
 RESOURCE :

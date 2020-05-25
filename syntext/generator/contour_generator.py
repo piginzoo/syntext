@@ -1,11 +1,11 @@
-from syntext.saver.saver import Saver
+from syntext.generator.generator import Generator
+from syntext.utils.utils import debug
 import numpy as np
 import os
 
-
-class ContourSaver(Saver):
+class ContourGenerator(Generator):
     """
-    标注文件样例：
+    会对每一个字进行标注，使用四点标注法。
     ```text
         你好，世界                      <---- 第1行，标注结果
         11,12,21,22,31,32,41,42 你     <---- 第2行-最后一行，标注每个文字的框
@@ -16,8 +16,40 @@ class ContourSaver(Saver):
     ```
     """
 
-    def __init__(self, conf):
-        self.conf = conf
+    def __init__(self, config, charset, fonts, backgrounds, text_creator, augmentor):
+        super().__init__(config, charset, fonts, backgrounds, text_creator, augmentor)
+
+    # {
+    #   "label":"你好世界！",
+    #   "pos":[
+    #       {
+    #           "bbox": [[x1,y1],[x1,y1],[x1,y1],[x1,y1]],
+    #           "word": "你"
+    #       },
+    #       ....
+    #   ]
+    # }
+    def build_label_data(self, text, char_bboxes):
+        debug("text：[%s], char_bboxes len(%d), char_bboxes:%r", text, len(char_bboxes), char_bboxes)
+        data = {}
+        data['label'] = text
+        data['pos'] = []
+        i = 0
+        for char in text:
+
+            if char == " ": continue  # 空格不标注的
+
+            debug("char_bboxes[i]:%r", char_bboxes[i])
+            pos = {
+                'word': char,
+                'bbox': char_bboxes[i]
+            }
+            data['pos'].append(pos)
+            debug("pos:%r", pos)
+
+            i += 1
+
+        return data
 
     # {
     #   "label":"你好世界！",

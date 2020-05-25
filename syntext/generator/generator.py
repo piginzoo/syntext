@@ -1,6 +1,5 @@
 from syntext.utils.utils import debug_save_image
 from multiprocessing import Process, Queue
-from syntext.augmentor import Augumentor
 from PIL import Image, ImageDraw, ImageFile
 import numpy as np
 import os, random
@@ -15,15 +14,16 @@ logger = logging.getLogger(__name__)
 # 为了解决：image file is truncated (XX bytes not processed) 异常
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
+
 class Generator():
-    def __init__(self, config, charset, fonts, backgrounds, saver):
+    def __init__(self, config, charset, fonts, backgrounds, text_creator, augmentor):
         self.config = config
         self.worker = config.COMMON['WORKER']
         self.charset = charset
         self.fonts = fonts
         self.backgrounds = backgrounds
-        self.saver = saver
-        self.augmentor = Augumentor(config)
+        self.text_creator = text_creator
+        self.augmentor = augmentor
 
     # 因为英文、数字、符号等ascii可见字符宽度短，所以要计算一下他的实际宽度，便于做样本的时候的宽度过宽
     def _caculate_text_shape(self, text, font):
@@ -83,15 +83,8 @@ class Generator():
                 logger.warning("尝试3次，无法找到合适的背景，放弃")
                 return None
 
-        print((x, y, x + width, y + height))
         bground = bground.crop((x, y, x + width, y + height))
         return bground
-
-    def charset(self):
-        pass
-
-    def save_image(self, image, path):
-        cv2.imwrite(path, image)
 
     def _create_image(self, id, queue, num, dir):
 
@@ -99,11 +92,11 @@ class Generator():
             try:
                 image_name = f"{id}-{i}.png"
                 image_path = os.path.join(dir, image_name)
-                image, text, bboxes = self.create_image()
+                image, text, bboxes = self._create_one_image()
                 image = self._pil2cv2(image)
                 image, bboxes = self.augmentor.augument(image, bboxes)
                 label_data = self.build_label_data(text, bboxes)
-                self.save_image(image, image_path)
+                cv2.imwrite(image_path, image)
                 debug_save_image(image_name, image, label_data)
                 queue.put({'image': image_path, 'label': label_data})
             except Exception as e:
@@ -119,8 +112,7 @@ class Generator():
                 data = queue.get()
                 image = data['image']
                 label = data['label']
-
-                self.saver.save(image, label)
+                self.save(image, label)
                 counter += 1
 
                 if counter >= total_num:
@@ -131,10 +123,6 @@ class Generator():
                 traceback.print_exc()
                 logger.error("样本保存发生错误，忽略此错误，继续....", str(e))
 
-    # 子类可能会重载
-    def build_label_data(self, text, char_bboxes):
-        return text
-
     def _pil2cv2(self, image):
         # PIL图像转成cv2
         image = image.convert('RGB')
@@ -142,7 +130,7 @@ class Generator():
         image = image[:, :, ::-1]
         return image
 
-    def create_image(self):
+    def _create_one_image(self):
 
         text = self.text_creator.generate()
         font, color = self._choose_font()
@@ -163,9 +151,6 @@ class Generator():
         bboxes = self._caculate_position(text, font, x, y)
 
         return background, text, bboxes
-
-    def save_label(self, label_data):
-        raise NotImplementedError("需要子类化")
 
     def execute(self, total_num, dir):
         producers = []
@@ -196,3 +181,23 @@ class Generator():
             sys.stdout.flush()
 
         logger.info("!!! 样本生成完成，合计[%d]张" % total_num)
+
+    def save(self, image_path, label):
+        lines = self.parse_lines(image_path, label)
+        label_file_name = self.get_label_name(image_path)
+
+        label_file = open(label_file_name, 'w', encoding='utf-8')
+        for line in lines:
+            label_file.write(line)
+            label_file.write("\n")
+        label_file.close()
+
+    # 子类可能会重载
+    def build_label_data(self, text, char_bboxes):
+        raise NotImplementedError("子类实现")
+
+    def parse_lines(self, image_path, label):
+        raise NotImplementedError("子类实现")
+
+    def get_label_name(self, image_path):
+        raise NotImplementedError("子类实现")

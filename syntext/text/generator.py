@@ -1,6 +1,6 @@
 class TextGenerator():
     """
-    这个类是父类，用来生成字符串
+    这个类是父类，用来定义某种类型的文本生成
     """
 
     def __init__(self, name, config):

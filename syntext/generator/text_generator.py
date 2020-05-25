@@ -1,7 +1,7 @@
-from syntext.saver.saver import Saver
+from syntext.generator.generator import Generator
 
 
-class NormalSaver(Saver):
+class TextOnlyGenerator(Generator):
     """
     标注文件样例：
     ```text

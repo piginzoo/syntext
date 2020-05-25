@@ -12,21 +12,35 @@
 - <https://github.com/Belval/TextRecognitionDataGenerator.git>
 - <https://github.com/Sanster/text_renderer>
 
-# 样本生成
+## 设计思路
 
-## 思路
-外部框架实现：
-- 多进程处理
-- 各资源的预加载
+样本生成主要需要做一下工作：
+
+- 加载资源，如（字体、背景图）
+- 支持多进程，提高效率
+- 各种策略来生成文字
+- 各种策略来增强生成的图片
+
+所以，实现的大抵思路也是如此：
 
 1、先加载字体、背景、字符集、字库
+
 2、生成一个串文本
+
 3、画文本到背景上，并确定bbox
-4、做增强
-    - 旋转
-    - 剪切
-    - 各种滤镜（模糊、噪音、...）
-5、最终保存图片和调整后的bbox
+
+4、使用开源项目[imgaug](https://imgaug.readthedocs.io/en/latest/)做增强
+
+5、保存图片、标签、和bbox
+
+
+# 两种生成方式
+
+目前，项目实现了两种样本的生成：
+
+1、仅生成图片和对应的文字标签
+
+2、生成图片和对应的文字标签，还要包含每个字的bbox信息
 
 ## 生成识别样本（仅有字符标注）
 
@@ -65,5 +79,29 @@ data/train/bcd.jpg 毁灭吧，世界！累了~
 11,12,21,22,31,32,41,42 界
 ```
 
-# 设计
+# 使用
 
+运行[bin/run.sh](bin/run.sh)可以生成图像，格式如下：
+```text
+bin/run.sh --dir output_dir --num number <--debug>
+
+例子：run.sh data/output/ 1000 --debug
+```
+- dir：样本生成目录
+- num：生成多个张
+- debug：是否显示更多的运行信息
+
+其他的运行细节，需要配置[config.yml](config.yml)：
+```text
+COMMON:
+    WORKER : 3                  # 多少个进程同时生成图片
+    TEXT_GENERATOR : random     # 随机生成:random, 语料生成:corpus
+    SAVER : contour             # 保存轮廓的:contour, 只保存标签: text
+```
+核心配置如上。
+
+**运行前，需要先下载背景（各类白纸）和字体资源**：
+
+[百度云盘下载](https://pan.baidu.com/s/1fVtt4UWC5nHDAe7U1sr-qg) 提取码: [f42h]
+
+并放置到 data/目录下。

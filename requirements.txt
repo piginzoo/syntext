@@ -1,0 +1,4 @@
+imgaug
+pillow
+opencv-python
+numpy
