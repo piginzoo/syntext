@@ -102,6 +102,6 @@ COMMON:
 
 **运行前，需要先下载背景（各类白纸）和字体资源**：
 
-[百度云盘下载](https://pan.baidu.com/s/1fVtt4UWC5nHDAe7U1sr-qg) 提取码: [f42h]
+[百度云盘下载](https://pan.baidu.com/s/1RU-JAnz7mP6w0REIXby0Zg)  提取码: 2rbd
 
 并放置到 data/目录下。

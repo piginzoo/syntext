@@ -1,8 +1,11 @@
 COMMON:
     WORKER : 3                  # 多少个进程同时生成图片
-    TEXT_CREATOR : random       # 随机生成:random, 语料生成:corpus
+    TEXT_CREATOR : corpus       # 随机生成:random, 语料生成:corpus
     GENERATOR : contour         # 保存轮廓的:contour, 只保存标签: text
 
+CORPUS:
+    FILE: data/corpus.txt       # 语料路径，如果是多个文件，请事先合并
+    MAX_LENGHT: 104857600       # 最大加载大小，默认是100M
 
 RESOURCE :
     FONT_DIR: data/fonts

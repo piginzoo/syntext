@@ -15,7 +15,7 @@ class GeneratorBuilder():
         if config.COMMON['TEXT_CREATOR'] == "random":
             text_creator = RandomTextCreator(config, charset)
         if config.COMMON['TEXT_CREATOR'] == "corpus":
-            text_creator = CorpusTextCreator()
+            text_creator = CorpusTextCreator(config)
 
         # 标签保存器
         if config.COMMON['GENERATOR'] == "contour":
