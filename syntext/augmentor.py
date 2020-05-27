@@ -39,6 +39,11 @@ class Augumentor():
                         alpha=(0, 3),  # 扭曲程度
                         sigma=(0.8, 1),  # 扭曲后的平滑程度
                         mode="nearest"),
+                ]),
+            ]),
+            # 模糊
+            iaa.Sometimes(0.5, [
+                iaa.OneOf([
                     iaa.GaussianBlur(sigma=(0, 0.7)),
                     iaa.AverageBlur(k=(1, 3)),
                     iaa.MedianBlur(k=(1, 3)),
@@ -94,6 +99,6 @@ class Augumentor():
             polys = []
             for p in polygons_aug.polygons:
                 polys.append(p.coords)
-            polys = np.array(polys, np.int32).tolist()
+            polys = np.array(polys, np.int32).tolist() # (N,2)
 
         return image, polys

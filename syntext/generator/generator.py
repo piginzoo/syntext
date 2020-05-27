@@ -36,7 +36,7 @@ class Generator():
         char_bboxes = []
         for c in text:
             w, h = font.getsize(c)
-            if c == " ":
+            if c == " ": # 忽略空格，但是位置要空出来
                 x_offset += w
                 continue
             char_char_bbox = [
@@ -94,16 +94,29 @@ class Generator():
                 image_path = os.path.join(dir, image_name)
                 image, text, bboxes = self._create_one_image()
                 image = self._pil2cv2(image)
+
+
                 image, bboxes = self.augmentor.augument(image, bboxes)
+
+                bboxes = self._revise_bboxes(bboxes)
+
                 label_data = self.build_label_data(text, bboxes)
                 cv2.imwrite(image_path, image)
-                debug_save_image(image_name, image, label_data)
+
+                debug_save_image(image_name, image, bboxes)
+
                 queue.put({'image': image_path, 'label': label_data})
             except Exception as e:
                 traceback.print_exc()
                 logger.error("[#%d-%d]样本生成发生错误，忽略此错误[%s]，继续...." % (id, i, str(e)))
 
         logger.info("生成进程[%d]生成完毕，合计[%d]张" % (id, num))
+
+    def _revise_bboxes(self, bboxes):
+        bboxes = np.array(bboxes)
+        minus_indices = bboxes < 0
+        bboxes[minus_indices] = 0
+        return bboxes.tolist()
 
     def _save_label(self, queue, total_num):
         counter = 0
@@ -148,7 +161,7 @@ class Generator():
         logger.debug("贴文字到背景的位置：(%d,%d)", x, y)
         background.paste(image, (x, y), image)
 
-        bboxes = self._caculate_position(text, font, x, y)
+        bboxes = self._caculate_position(text, font, x, y) # 计算每个字的bbox
 
         return background, text, bboxes
 

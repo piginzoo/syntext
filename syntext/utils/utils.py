@@ -46,7 +46,7 @@ def debug(*args):
 
 
 
-def debug_save_image(name, image, label):
+def debug_save_image(name, image, bboxes): # bboxes[N,M,2]
     if not DEBUG: return
 
     image = image.copy()
@@ -55,21 +55,12 @@ def debug_save_image(name, image, label):
         os.makedirs(debug_dir)
     debug_image_path = os.path.join(debug_dir, name)
 
-    # {
-    #   "label":"你好世界！",
-    #   "pos":[
-    #       {
-    #           "bbox": [[x1,y1],[x1,y1],[x1,y1],[x1,y1]],
-    #           "word": "你"
-    #       },
-    #       ....
-    #   ]
-    # }
-    if type(label)==dict and "pos" in label:
-        for pos in label['pos']:
-            bboxes = np.array(pos['bbox'])
-            cv2.polylines(image, [bboxes], isClosed=True, color=(0,0,255))
-        cv2.imwrite(debug_image_path,image)
+    for one_word_bboxes in bboxes:
+        # print(one_word_bboxes)
+        one_word_bboxes = np.array(one_word_bboxes)
+        cv2.polylines(image, [one_word_bboxes], isClosed=True, color=(0, 0, 255))
+
+    cv2.imwrite(debug_image_path,image)
 
 
 def dynamic_load(module_name, parent_class):
