@@ -17,10 +17,10 @@ class TextOnlyGenerator(Generator):
     def build_label_data(self, text, char_bboxes):
         return text
 
-    def get_label_name(self, image_path):
+    def get_label_name_and_mode(self, image_path):
         dir,_ = os.path.split(image_path)
         label_file_path = os.path.join(dir, "train.txt")
-        return label_file_path
+        return label_file_path, "a" # 每次在文件上追加
 
     def parse_lines(self, image_path, label):
         return [image_path + " " + label]

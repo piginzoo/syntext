@@ -89,10 +89,10 @@ class ContourGenerator(Generator):
 
         return bbox_list + "," + word
 
-    def get_label_name(self, image_path):
+    def get_label_name_and_mode(self, image_path):
         name, ext = os.path.splitext(image_path)
         label_file_path = name + ".txt"
-        return label_file_path
+        return label_file_path, "w" # 每次都覆盖旧文件
 
     def parse_lines(self, image_path, label):
         lines = []

@@ -35,6 +35,7 @@ def __load_fonts(conf):
         font_name = os.path.join(font_dir, font_name)
         for size in font_sizes:
             font = ImageFont.truetype(font_name, size)
+
             fonts.append(font)
     logger.info("所有字体加载完毕[%d]个", len(fonts))
     return fonts

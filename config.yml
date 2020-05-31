@@ -60,8 +60,8 @@ POSSIBILITY_WORD_INTEFER : 0.1  # 需要被干扰的图片，包括干扰线和�
 POSSIBILITY_AFFINE  : 0.3       # 需要被做仿射的文字
 
 POSSIBILITY_TEXT:
-    normal : 1                # 最普通的情况（汉字+数字+英文+符号）
-    number : 0                # 需要产生的纯数字
-    english : 0               # 需要产生的英语
-    date : 0                  # 需要产生的纯日期
-#    single : 0.01               # 单字的比例
+    normal : 1                  # 最普通的情况（汉字+数字+英文+符号）
+    number : 0.2                # 需要产生的纯数字
+    english : 0.1               # 需要产生的英语
+    date : 0.1                  # 需要产生的纯日期
+    single : 0.01               # 单字的比例

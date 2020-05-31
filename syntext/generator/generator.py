@@ -36,12 +36,18 @@ class Generator():
         char_bboxes = []
         for c in text:
             w, h = font.getsize(c)
+            # refer to : https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
+            ascent, descent = font.getmetrics()
+            (width, baseline), (offset_x, offset_y) = font.font.getsize(c)
+            # print("y_offset",y_offset)
+            # print("offset_y",offset_y)
+
             if c == " ": # 忽略空格，但是位置要空出来
                 x_offset += w
                 continue
             char_char_bbox = [
-                [x_offset, y_offset],
-                [x_offset + w, y_offset],
+                [x_offset, y_offset+offset_y],
+                [x_offset + w, y_offset+offset_y],
                 [x_offset + w, h + y_offset],
                 [x_offset, h + y_offset]
             ]
@@ -112,6 +118,7 @@ class Generator():
 
         logger.info("生成进程[%d]生成完毕，合计[%d]张" % (id, num))
 
+    # 坐标如果为负，则置为0
     def _revise_bboxes(self, bboxes):
         bboxes = np.array(bboxes)
         minus_indices = bboxes < 0
@@ -197,9 +204,9 @@ class Generator():
 
     def save(self, image_path, label):
         lines = self.parse_lines(image_path, label)
-        label_file_name = self.get_label_name(image_path)
+        label_file_name, mode = self.get_label_name_and_mode(image_path)
 
-        label_file = open(label_file_name, 'a', encoding='utf-8')
+        label_file = open(label_file_name, mode, encoding='utf-8')
 
         for line in lines:
             label_file.write(line)
@@ -213,5 +220,5 @@ class Generator():
     def parse_lines(self, image_path, label):
         raise NotImplementedError("子类实现")
 
-    def get_label_name(self, image_path):
+    def get_label_name_and_mode(self, image_path):
         raise NotImplementedError("子类实现")
