@@ -67,7 +67,7 @@ def dynamic_load(module_name, parent_class):
     base_module = importlib.import_module(module_name)
     classes = []
 
-    for _, name, is_pkg in walk_packages(base_module.__path__, prefix=f"{module_name}."):
+    for _, name, is_pkg in walk_packages(base_module.__path__, prefix="{}.".format(module_name)):
         if is_pkg: continue
 
         module = importlib.import_module(name)
