@@ -3,4 +3,4 @@ if [ "$2" = "" ]; then
     exit
 fi
 
-python -m syntext.main $*
+nohup python -m syntext.main $*>data/log.txt 2>&1 &

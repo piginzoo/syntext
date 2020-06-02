@@ -37,7 +37,7 @@ def __load_fonts(conf):
             font = ImageFont.truetype(font_name, size)
 
             fonts.append(font)
-    logger.info("所有字体加载完毕[%d]个", len(fonts))
+        logger.info("所有字体加载完毕[%d]个", len(fonts))
     return fonts
 
 
