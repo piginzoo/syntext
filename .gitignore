@@ -4,6 +4,7 @@ syntext/test/debug
 data/*
 !data/test/
 !data/charset.txt
+!data/charset.4100.txt
 
 .idea
 *.pyc
