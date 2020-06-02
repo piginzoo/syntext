@@ -39,7 +39,12 @@ class ContourGenerator(Generator):
 
             if char == " ": continue  # 空格不标注的
 
-            debug("char_bboxes[i]:%r", char_bboxes[i])
+            if i> len(text)-1:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning("索引[%d]超过字符串长度[%d]:%s",i,len(text),text)
+                return None
+
             pos = {
                 'word': char,
                 'bbox': char_bboxes[i]

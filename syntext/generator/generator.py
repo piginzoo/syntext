@@ -39,8 +39,6 @@ class Generator():
             # refer to : https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
             ascent, descent = font.getmetrics()
             (width, baseline), (offset_x, offset_y) = font.font.getsize(c)
-            # print("y_offset",y_offset)
-            # print("offset_y",offset_y)
 
             if c == " ":  # 忽略空格，但是位置要空出来
                 x_offset += w
@@ -111,6 +109,9 @@ class Generator():
                 bboxes = self._revise_bboxes(bboxes)
 
                 label_data = self.build_label_data(text, bboxes)
+
+                if label_data is None: continue # 异常的话，重新生成
+
                 cv2.imwrite(image_path, image)
 
                 debug_save_image(image_name, image, bboxes)
