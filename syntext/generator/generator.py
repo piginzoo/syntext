@@ -213,7 +213,10 @@ class Generator():
             time.sleep(1)
             timeout += 1
 
-        logger.info("!!! 样本生成完成，合计[%d]张，耗时: %d 秒" % (total_num, time.time() - start))
+        all_seconds = time.time() - start
+        minutes = all_seconds//60
+        seconds = all_seconds % 60
+        logger.info("!!! 样本生成完成，合计[%d]张，耗时: %d 分 %d 秒" % (total_num, minutes, seconds))
 
     def save(self, image_path, label):
         lines = self.parse_lines(image_path, label)

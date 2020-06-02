@@ -44,7 +44,7 @@ class ContourGenerator(Generator):
             if char == " ": continue  # 空格不标注的
 
             if i > len(char_bboxes) - 1:
-                logger.warning("索引[%d]超过字符串长度[%d]:%s", i, len(text), text)
+                logger.warning("索引超过字符串bbox长度[%d]:%s", i, len(char_bboxes), text)
                 return None
 
             pos = {
