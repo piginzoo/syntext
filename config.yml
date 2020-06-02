@@ -1,5 +1,4 @@
 COMMON:
-    WORKER : 3                  # 多少个进程同时生成图片
     TEXT_CREATOR : random       # 随机生成:random, 语料生成:corpus
     GENERATOR : contour         # 保存轮廓的:contour, 只保存标签: text
 
@@ -10,54 +9,27 @@ CORPUS:
 RESOURCE :
     FONT_DIR: data/fonts
     BACKGROUND_DIR: data/backgrounds
-    CHARSET: data/charset.txt
+    CHARSET: data/charset.4100.txt
 
 MAX_GENERATE_NUM : 1000000000   # 生成的最大的整形数
 MAX_LENGTH : 20                 # 可能的最大长度（字符数）
 MIN_LENGTH : 1                  # 可能的最小长度（字符数）
 MAX_FONT_SIZE : 28              # 最大的字体
 MIN_FONT_SIZE : 18              # 最小的字体号
-MAX_LINE_HEIGHT: 100            # 最大的高度（像素）
-MIN_LINE_HEIGHT:  12            # 最小的高度（像素）
 
 # 颜色的算法是，产生一个基准，然后RGB上下浮动FONT_COLOR_NOISE
 MAX_FONT_COLOR : 128            # 最大的可能颜色
 FONT_COLOR_NOISE : 10           # 最大的可能颜色
-ONE_CHARACTOR_WIDTH : 1024      # 一个字的宽度
-ROTATE_ANGLE : 4                # 随机旋转角度
-GAUSS_RADIUS_MIN : 0.5          # 高斯模糊的radius最小值
-GAUSS_RADIUS_MAX : 0.8          # 高斯模糊的radius最大值
 
-# 之前的设置，太大，我决定改改
-MAX_BACKGROUND_WIDTH : 700
-MIN_BACKGROUND_WIDTH : 500
-MAX_BACKGROUND_HEIGHT : 900
-MIN_BACKGROUND_HEIGHT : 800
 
 MAX_SPECIAL_NUM : 5             # 特殊字符的个数
 MAX_BLANK_NUM : 5               # 字之间随机的空格数量
-MIN_BLANK_WIDTH : 50            # 最小的句子间的随机距离
-MAX_BLANK_WIDTH : 100           # 最长的句子间距离
-
-INTERFER_LINE_NUM : 10
-INTERFER_POINT_NUM : 2000
-INTERFER_LINE_WIGHT : 2
-INTERFER_WORD_LINE_NUM : 4
-INTERFER_WORD_POINT_NUM : 20
-INTERFER_WORD_LINE_WIGHT : 1
-
-MIN_EDGE_HEIGHT : 1             # 切边的最小高度
-MAX_EDGE_HEIGHT : 3             # 切边的最大高度
 TEXT_WIDTH_PAD : 50             # 文字的左右pad
 TEXT_HEIGHT_PAD : 10            # 文字的上下pad
 
 # 各种可能性的概率
 POSSIBILITY_BLANK : 1           # 有空格的概率
-POSSIBILITY_SPECIAL : 1         # 插入一些特殊字符的概率
-POSSIBILITY_ROTOATE : 0.4       # 文字的旋转
-POSSIBILITY_INTEFER : 0.2       # 需要被干扰的图片，包括干扰线和点
-POSSIBILITY_WORD_INTEFER : 0.1  # 需要被干扰的图片，包括干扰线和点
-POSSIBILITY_AFFINE  : 0.3       # 需要被做仿射的文字
+POSSIBILITY_SPECIAL : 0.1       # 插入一些特殊字符的概率
 
 POSSIBILITY_TEXT:
     normal : 1                  # 最普通的情况（汉字+数字+英文+符号）

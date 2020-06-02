@@ -6,6 +6,7 @@ import os, random
 import traceback
 import logging
 import time
+import math
 import sys
 import cv2
 
@@ -18,7 +19,6 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 class Generator():
     def __init__(self, config, charset, fonts, backgrounds, text_creator, augmentor):
         self.config = config
-        self.worker = config.COMMON['WORKER']
         self.charset = charset
         self.fonts = fonts
         self.backgrounds = backgrounds
@@ -42,12 +42,12 @@ class Generator():
             # print("y_offset",y_offset)
             # print("offset_y",offset_y)
 
-            if c == " ": # 忽略空格，但是位置要空出来
+            if c == " ":  # 忽略空格，但是位置要空出来
                 x_offset += w
                 continue
             char_char_bbox = [
-                [x_offset, y_offset+offset_y],
-                [x_offset + w, y_offset+offset_y],
+                [x_offset, y_offset + offset_y],
+                [x_offset + w, y_offset + offset_y],
                 [x_offset + w, h + y_offset],
                 [x_offset, h + y_offset]
             ]
@@ -94,13 +94,17 @@ class Generator():
 
     def _create_image(self, id, queue, num, dir):
 
-        for i in range(num):
+        counter = 0
+
+        while True:
+
+            if counter >= num: break
+
+            image_name = f"{id}-{counter}.png"
             try:
-                image_name = f"{id}-{i}.png"
                 image_path = os.path.join(dir, image_name)
                 image, text, bboxes = self._create_one_image()
                 image = self._pil2cv2(image)
-
 
                 image, bboxes = self.augmentor.augument(image, bboxes)
 
@@ -112,11 +116,11 @@ class Generator():
                 debug_save_image(image_name, image, bboxes)
 
                 queue.put({'image': image_path, 'label': label_data})
+                counter += 1
             except Exception as e:
-                traceback.print_exc()
-                logger.error("[#%d-%d]样本生成发生错误，忽略此错误[%s]，继续...." % (id, i, str(e)))
+                logger.exception(f"{id}-{counter}.png 样本生成发生错误，忽略此错误[%s]，继续....")
 
-        logger.info("生成进程[%d]生成完毕，合计[%d]张" % (id, num))
+        logger.info("[生成进程 %d] 生成完毕，退出！合计[%d]张" % (id, num))
 
     # 坐标如果为负，则置为0
     def _revise_bboxes(self, bboxes):
@@ -136,12 +140,11 @@ class Generator():
                 counter += 1
 
                 if counter >= total_num:
-                    logger.info("完成了所有的样本生成")
+                    logger.info("[写入进程] 完成了所有样本的写入")
                     break
             except Exception as e:
-                import traceback
-                traceback.print_exc()
-                logger.error("样本保存发生错误，忽略此错误，继续....", str(e))
+                counter += 1
+                logger.exception("[写入进程] 样本保存发生错误，忽略此错误，继续....")
 
     def _pil2cv2(self, image):
         # PIL图像转成cv2
@@ -168,37 +171,41 @@ class Generator():
         logger.debug("贴文字到背景的位置：(%d,%d)", x, y)
         background.paste(image, (x, y), image)
 
-        bboxes = self._caculate_position(text, font, x, y) # 计算每个字的bbox
+        bboxes = self._caculate_position(text, font, x, y)  # 计算每个字的bbox
 
         return background, text, bboxes
 
-    def execute(self, total_num, dir):
+    def execute(self, total_num, dir, worker):
         producers = []
         queue = Queue()
 
         consumer = Process(target=self._save_label, args=(queue, total_num))
         consumer.start()
 
-        num = total_num // self.worker
-        for id in range(self.worker):
+        # 把任务平分到每个work进程中，多余的放到最后一个进程，10=>[3,3,4], 11=>[4,4,3]，原则是尽量均衡
+        per_num = round(total_num / worker)
+        worker_num = [0] * 10
+        worker_num[0:-1] = [per_num] * (worker - 1)
+        worker_num[-1] = total_num - (worker - 1) * per_num
+
+        # 启动生成进程，并且主进程等待他们都结束才继续
+        for id, num in enumerate(worker_num):
             p = Process(target=self._create_image, args=(id, queue, num, dir))
             producers.append(p)
             p.start()
-            p.join()
+        for p in producers:
+            p.join()  # 要等着这些子进程结束后，主进程在往下
 
         logger.info("生成进程全部运行完毕，等待写入进程工作...")
         timeout = 0
         while True:
             if not consumer.is_alive(): break
-            if timeout > 3:
-                logger.warning("超时30秒退出")
+            if timeout > 300:
+                logger.warning("超时5分钟退出")
                 consumer.terminate()
                 break
-
             time.sleep(1)
             timeout += 1
-            print(".", end='')
-            sys.stdout.flush()
 
         logger.info("!!! 样本生成完成，合计[%d]张" % total_num)
 

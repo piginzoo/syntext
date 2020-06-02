@@ -54,6 +54,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir")
+    parser.add_argument("--worker", type=int)
     parser.add_argument("--num", type=int)
     parser.add_argument("--debug", default=False, action='store_true')
     args = parser.parse_args()
@@ -75,4 +76,4 @@ if __name__ == "__main__":
     builder = GeneratorBuilder()
     generator = builder.build(config, charset, fonts, backgrounds)
 
-    generator.execute(total_num=args.num, dir=args.dir)
+    generator.execute(total_num=args.num, dir=args.dir, worker=args.worker)
