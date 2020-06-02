@@ -100,7 +100,7 @@ class Generator():
 
             if counter >= num: break
 
-            image_name = "{}-{}.png".format(id,counter)
+            image_name = "{}-{}.png".format(id, counter)
             try:
                 image_path = os.path.join(dir, image_name)
                 image, text, bboxes = self._create_one_image()
@@ -118,7 +118,7 @@ class Generator():
                 queue.put({'image': image_path, 'label': label_data})
                 counter += 1
             except Exception as e:
-                logger.exception("{}-{}.png 样本生成发生错误，忽略此错误[%s]，继续....".format(id,counter))
+                logger.exception("{}-{}.png 样本生成发生错误，忽略此错误[%s]，继续....".format(id, counter))
 
         logger.info("[生成进程 {}] 生成完毕，退出！合计[{}]张".format(id, num))
 
@@ -176,6 +176,8 @@ class Generator():
         return background, text, bboxes
 
     def execute(self, total_num, dir, worker):
+        start = time.time()
+
         producers = []
         queue = Queue()
 
@@ -207,7 +209,7 @@ class Generator():
             time.sleep(1)
             timeout += 1
 
-        logger.info("!!! 样本生成完成，合计[%d]张" % total_num)
+        logger.info("!!! 样本生成完成，合计[%d]张，耗时: %d 秒" % (total_num, time.time() - start))
 
     def save(self, image_path, label):
         lines = self.parse_lines(image_path, label)
