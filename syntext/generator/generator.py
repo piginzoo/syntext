@@ -100,7 +100,7 @@ class Generator():
 
             if counter >= num: break
 
-            image_name = f"{id}-{counter}.png"
+            image_name = "{}-{}.png".format(id,counter)
             try:
                 image_path = os.path.join(dir, image_name)
                 image, text, bboxes = self._create_one_image()
@@ -118,9 +118,9 @@ class Generator():
                 queue.put({'image': image_path, 'label': label_data})
                 counter += 1
             except Exception as e:
-                logger.exception(f"{id}-{counter}.png 样本生成发生错误，忽略此错误[%s]，继续....")
+                logger.exception("{}-{}.png 样本生成发生错误，忽略此错误[%s]，继续....".format(id,counter))
 
-        logger.info("[生成进程 %d] 生成完毕，退出！合计[%d]张" % (id, num))
+        logger.info("[生成进程 {}] 生成完毕，退出！合计[{}]张".format(id, num))
 
     # 坐标如果为负，则置为0
     def _revise_bboxes(self, bboxes):
