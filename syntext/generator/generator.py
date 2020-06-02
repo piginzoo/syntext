@@ -93,6 +93,7 @@ class Generator():
     def _create_image(self, id, queue, num, dir):
 
         counter = 0
+        error_counter = 0
 
         while True:
 
@@ -110,7 +111,9 @@ class Generator():
 
                 label_data = self.build_label_data(text, bboxes)
 
-                if label_data is None: continue # 异常的话，重新生成
+                if label_data is None:
+                    error_counter+= 1
+                    continue # 异常的话，重新生成
 
                 cv2.imwrite(image_path, image)
 
@@ -121,7 +124,7 @@ class Generator():
             except Exception as e:
                 logger.exception("{}-{}.png 样本生成发生错误，忽略此错误[%s]，继续....".format(id, counter))
 
-        logger.info("[生成进程 {}] 生成完毕，退出！合计[{}]张".format(id, num))
+        logger.info("[生成进程 {}] 生成完毕，退出！合计[{}]张，出现问题[{}]张".format(id, num, error_counter))
 
     # 坐标如果为负，则置为0
     def _revise_bboxes(self, bboxes):
