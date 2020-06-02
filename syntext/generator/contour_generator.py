@@ -1,7 +1,11 @@
 from syntext.generator.generator import Generator
 from syntext.utils.utils import debug
 import numpy as np
+import logging
 import os
+
+logger = logging.getLogger(__name__)
+
 
 class ContourGenerator(Generator):
     """
@@ -39,10 +43,8 @@ class ContourGenerator(Generator):
 
             if char == " ": continue  # 空格不标注的
 
-            if i> len(text)-1:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.warning("索引[%d]超过字符串长度[%d]:%s",i,len(text),text)
+            if i > len(char_bboxes) - 1:
+                logger.warning("索引[%d]超过字符串长度[%d]:%s", i, len(text), text)
                 return None
 
             pos = {
@@ -97,7 +99,7 @@ class ContourGenerator(Generator):
     def get_label_name_and_mode(self, image_path):
         name, ext = os.path.splitext(image_path)
         label_file_path = name + ".txt"
-        return label_file_path, "w" # 每次都覆盖旧文件
+        return label_file_path, "w"  # 每次都覆盖旧文件
 
     def parse_lines(self, image_path, label):
         lines = []
