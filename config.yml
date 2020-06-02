@@ -9,7 +9,7 @@ CORPUS:
 RESOURCE :
     FONT_DIR: data/fonts
     BACKGROUND_DIR: data/backgrounds
-    CHARSET: data/charset.4100.txt
+    CHARSET: config/charset.4100.txt
 
 MAX_GENERATE_NUM : 1000000000   # 生成的最大的整形数
 MAX_LENGTH : 20                 # 可能的最大长度（字符数）

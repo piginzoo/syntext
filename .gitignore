@@ -1,12 +1,8 @@
 logs/
 syntext/test/debug
 data
-!data/
+data/
 data/*
-!data/test/
-!data/charset.txt
-!data/charset.4100.txt
-
 .idea
 *.pyc
 */*.pyc
