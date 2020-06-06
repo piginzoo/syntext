@@ -35,19 +35,48 @@ class Generator():
     def _caculate_position(self, text, font, x_offset, y_offset):
         char_bboxes = []
         for c in text:
-            w, h = font.getsize(c)
-            # refer to : https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
-            ascent, descent = font.getmetrics()
-            (width, baseline), (offset_x, offset_y) = font.font.getsize(c)
 
+            # refer to : https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
+            w, h = font.getsize(c)
             if c == " ":  # 忽略空格，但是位置要空出来
                 x_offset += w
                 continue
+
+            bbox = font.getmask(c).getbbox()
+            if bbox is None:
+                logger.warning("无法计算字符[%s]的bbox",c)
+                x_offset += w
+                continue
+
+            ascent, descent = font.getmetrics()
+            fix_height = ascent + descent  # 整个字的高度（包含上下余白，不同的字都是一个固定数）
+            (width2, baseline), (offset_x, offset_y) = font.font.getsize(c)
+            bbox_w = bbox[2] - bbox[0]
+            bbox_h = bbox[3] - bbox[1]
+            # 左右两边尽量充满
+            left, right = x_offset + bbox[0], x_offset + bbox[2]
+            left_padding = bbox[0]
+            right_padding = w - bbox[2]
+            if left_padding > right_padding:
+                left = left - right_padding + 1  # 空2个像素
+                right = x_offset + w - 1
+            else:
+                left = x_offset + 1
+                right = right + left_padding - 1  # 空2个像素
+            # 高度小于高1/2，补高度的1/2
+            top = y_offset + bbox[1] + offset_y
+            bottom = y_offset + bbox[3] + offset_y
+            if (bbox_h / fix_height) < (1 / 2):
+                expand = math.floor(h * 1 / 4)
+                top -= expand
+                bottom += expand
+
+
             char_char_bbox = [
-                [x_offset, y_offset + offset_y],
-                [x_offset + w, y_offset + offset_y],
-                [x_offset + w, h + y_offset],
-                [x_offset, h + y_offset]
+                [left, top],
+                [right, top],
+                [right, bottom],
+                [left, bottom]
             ]
             char_bboxes.append(char_char_bbox)
             x_offset += w
@@ -112,8 +141,8 @@ class Generator():
                 label_data = self.build_label_data(text, bboxes)
 
                 if label_data is None:
-                    error_counter+= 1
-                    continue # 异常的话，重新生成
+                    error_counter += 1
+                    continue  # 异常的话，重新生成
 
                 cv2.imwrite(image_path, image)
 
@@ -214,7 +243,7 @@ class Generator():
             timeout += 1
 
         all_seconds = time.time() - start
-        minutes = all_seconds//60
+        minutes = all_seconds // 60
         seconds = all_seconds % 60
         logger.info("!!! 样本生成完成，合计[%d]张，耗时: %d 分 %d 秒" % (total_num, minutes, seconds))
 
