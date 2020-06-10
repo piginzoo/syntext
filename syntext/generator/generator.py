@@ -178,6 +178,7 @@ class Generator():
             except Exception as e:
                 counter += 1
                 logger.exception("[写入进程] 样本保存发生错误，忽略此错误，继续....")
+        logger.info("[写入进程] 已经完成，退出")
 
     def _pil2cv2(self, image):
         # PIL图像转成cv2

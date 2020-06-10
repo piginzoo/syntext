@@ -2,7 +2,7 @@ from syntext.text.generator import TextGenerator
 import numpy as np
 import random
 
-class DateGenerator(TextGenerator):
+class EnglishGenerator(TextGenerator):
     def __init__(self, config, charset):
         super().__init__("english",config)
         self.charset = charset

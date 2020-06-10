@@ -55,6 +55,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir")
     parser.add_argument("--worker", type=int)
+    parser.add_argument("--config", type=str)
     parser.add_argument("--num", type=int)
     parser.add_argument("--debug", default=False, action='store_true')
     args = parser.parse_args()
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(args.dir): os.mkdir(args.dir)
 
-    config = Config()
+    config = Config(args.config)
     fonts = __load_fonts(config)
     backgrounds = __load_background(config.RESOURCE['BACKGROUND_DIR'])
     charset = __load_charset(config.RESOURCE['CHARSET'])

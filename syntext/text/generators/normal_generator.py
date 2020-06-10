@@ -1,7 +1,7 @@
 import time,random
 from syntext.text.generator import TextGenerator
 
-class DateGenerator(TextGenerator):
+class NormalGenerator(TextGenerator):
     def __init__(self, config, charset):
         super().__init__("normal", config)
         self.charset = charset
