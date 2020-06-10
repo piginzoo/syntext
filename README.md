@@ -91,13 +91,22 @@ data/train/bcd.jpg 毁灭吧，世界！累了~
 ## 运行程序
 运行[bin/run.sh](bin/run.sh)可以生成图像，格式如下：
 ```text
-bin/run.sh --dir output_dir --num number <--debug>
-
-例子：run.sh data/output/ 1000 --debug
+bin/run.sh --dir output_dir --num number --config config/config.yml <--debug>
 ```
 - dir：样本生成目录
 - num：生成多个张
 - debug：是否显示更多的运行信息
+- config: 使用的配置文件
+
+【三种默认配置】
+
+目前提供了3种默认配置，方便各类样本生成：
+
+- config/config.contour.yml: 生成带有轮廓标注的随机文本
+- config/config.corpus.yml:  生成基于语料的，仅有文本标注的样本
+- config/config.captcha.yml: 生成仅包含数字和字母的用于验证码识别的样本
+
+你还可以根据给出的配置，微调你的生成参数。
 
 ## 配置
 
