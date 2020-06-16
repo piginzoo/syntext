@@ -151,7 +151,7 @@ class Generator():
                 queue.put({'image': image_path, 'label': label_data})
                 counter += 1
             except Exception as e:
-                logger.exception("{}-{}.png 样本生成发生错误，忽略此错误[%s]，继续....".format(id, counter))
+                logger.exception("{}-{}.png 样本生成发生错误，忽略，继续....".format(id, counter))
 
         logger.info("[生成进程 {}] 生成完毕，退出！合计[{}]张，出现问题[{}]张".format(id, num, error_counter))
 

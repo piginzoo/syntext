@@ -18,7 +18,7 @@ def __load_background(bground_dir):
         for img_name in os.listdir(bground_dir):
             name, ext = os.path.splitext(img_name)
 
-            if ext.upper()!="JPG" or ext.upper()!="PNG" or ext.upper()!="JPEG": continue
+            if ext.upper()!=".JPG" and ext.upper()!=".PNG" and ext.upper()!=".JPEG": continue
 
             full_path = os.path.join(bground_dir, img_name)
             image = Image.open(full_path)
@@ -31,6 +31,7 @@ def __load_background(bground_dir):
 
     if(len(bground_list)==0):
         image = np.random.randint(200, 255, (800, 600, 3))
+        image = Image.fromarray(image.astype('uint8'))
         bground_list.append(image)
         logger.warning("无法加载目录[%s]的背景，使用默认背景", bground_dir)
 

@@ -1,5 +1,5 @@
 COMMON:
-    TEXT_CREATOR : random       # 随机生成:random, 语料生成:corpus
+    TEXT_CREATOR : corpus       # 随机生成:random, 语料生成:corpus
     GENERATOR : contour         # 保存轮廓的:contour, 只保存标签: text
 
 CORPUS:
