@@ -4,7 +4,7 @@
 
 COMMON:
     TEXT_CREATOR : random       # 随机生成:random, 语料生成:corpus
-    GENERATOR : text            # 保存轮廓的:contour, 只保存标签: text<---
+    GENERATOR : contour         # 保存轮廓的:contour, 只保存标签: text<---需要轮廓生成
 
 CORPUS:
     FILE: data/corpus.txt       # 语料路径，如果是多个文件，请事先合并
