@@ -1,13 +1,12 @@
 from syntext.utils.utils import debug_save_image
 from multiprocessing import Process, Queue
 from PIL import Image, ImageDraw, ImageFile
+from tqdm import tqdm
 import numpy as np
 import os, random
-import traceback
 import logging
 import time
 import math
-import sys
 import cv2
 
 logger = logging.getLogger(__name__)
@@ -164,8 +163,13 @@ class Generator():
 
     def _save_label(self, queue, total_num):
         counter = 0
+        pbar = tqdm(total=total_num)
+        pbar_step = total_num // 100
         while True:
             try:
+
+                if counter!=0 and counter % pbar_step ==0: pbar.update(1)
+
                 data = queue.get()
                 image = data['image']
                 label = data['label']
@@ -174,6 +178,7 @@ class Generator():
 
                 if counter >= total_num:
                     logger.info("[写入进程] 完成了所有样本的写入")
+                    pbar.close()
                     break
             except Exception as e:
                 counter += 1
