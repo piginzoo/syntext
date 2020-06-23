@@ -16,8 +16,8 @@ RESOURCE :
     CHARSET: config/charset.alphabeta.txt # 只有数字和英文的字符集<---
 
 MAX_GENERATE_NUM : 1000000000   # 生成的最大的整形数
-MAX_LENGTH : 4                  # 可能的最大长度（字符数）
-MIN_LENGTH : 4                  # 可能的最小长度（字符数）
+MAX_LENGTH : 20                  # 可能的最大长度（字符数）
+MIN_LENGTH : 1                  # 可能的最小长度（字符数）
 MAX_FONT_SIZE : 28              # 最大的字体
 MIN_FONT_SIZE : 18              # 最小的字体号
 
@@ -32,12 +32,12 @@ TEXT_WIDTH_PAD : 50             # 文字的左右pad
 TEXT_HEIGHT_PAD : 10            # 文字的上下pad
 
 # 各种可能性的概率
-POSSIBILITY_BLANK : 0           # 有空格的概率<---
-POSSIBILITY_SPECIAL : 0         # 插入一些特殊字符的概率<---
+POSSIBILITY_BLANK : 0.5         # 有空格的概率
+POSSIBILITY_SPECIAL : 0         # 插入一些特殊字符的概率<---不插入
 
 POSSIBILITY_TEXT:
-    normal : 1                  # 最普通的情况（汉字+数字+英文+符号）<---
-    number : 0                  # 需要产生的纯数字<---
-    english : 0                 # 需要产生的英语<---
-    date : 0                    # 需要产生的纯日期<---
-    single : 0                  # 单字的比例<---
+    normal : 1                  # 最普通的情况（汉字+数字+英文+符号）<---全部
+    number : 0                  # 需要产生的纯数字<--- 不产生纯数字
+    english : 0                 # 需要产生的英语<--- 不产生纯英文
+    date : 0                    # 需要产生的纯日期<--- 不产生纯日期
+    single : 0                  # 单字的比例<--- 不产生单个字符

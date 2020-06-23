@@ -5,10 +5,11 @@ if [ "$1" = "stop" ]; then
 fi
 
 if [ "$2" = "" ]; then
-    echo "Usage: run.sh --dir output_dir --worker worker_number --num number --config config.yml <--debug>"
-    echo "    captcha gen: run.sh --dir data/output --worker 3 --num 100 --config config/config.captcha.yml --debug"
-    echo "    coutour gen: run.sh --dir data/output --worker 3 --num 100 --config config/config.contour.yml --debug"
-    echo "    corpus  gen: run.sh --dir data/output --worker 3 --num 100 --config config/config.corpus.yml --debug"
+    echo "Usage: bin/run.sh --dir output_dir --worker worker_number --num number --config config.yml <--debug>"
+    echo "    captcha gen: bin/run.sh --dir data/output --worker 3 --num 100 --config config/config.captcha.yml --debug"
+    echo "    english gen: bin/run.sh --dir data/output --worker 3 --num 100 --config config/config.alphabeta.yml --debug"
+    echo "    coutour gen: bin/run.sh --dir data/output --worker 3 --num 100 --config config/config.contour.yml --debug"
+    echo "    corpus  gen: bin/run.sh --dir data/output --worker 3 --num 100 --config config/config.corpus.yml --debug"
     exit
 fi
 
