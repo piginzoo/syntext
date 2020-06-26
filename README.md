@@ -1,6 +1,6 @@
 # 项目概述
 
-这个项目用于生成训练过程中的样本。
+这个项目用于生成OCR印刷体样本。
 
 实现了以下功能：
 - 可以基于字库随机生成，并且可以配置数字、日期、汉字、混英文等各自的生成概率
@@ -8,6 +8,9 @@
 - 可以支持多种效果进行增强：变形、剪切、噪音、模糊等
 - 可以支持多种字体和多种背景（可定制）
 - 可以支持只产生文本样本，也支持带有每个字坐标标注的样本
+
+此项目更适合印刷、打印纸质样本的模拟，不适合自然场景下的文本生成。
+此项目缘起于本人印刷体、打印体文字识别的场景下的样本增强。
 
 ## 参考
 
@@ -18,6 +21,9 @@
 - <https://github.com/JarveeLee/SynthText_Chinese_version>
 - <https://github.com/Belval/TextRecognitionDataGenerator.git>
 - <https://github.com/Sanster/text_renderer>
+
+此项目直接使用了一下开源项目：
+- [imgaug](https://imgaug.readthedocs.io/en/latest/)项目，作为样本增强效果的实现。
 
 ## 设计思路
 
@@ -104,11 +110,12 @@ bin/run.sh --dir output_dir --num number --config config/config.yml <--debug>
 
 - config/config.contour.yml: 生成带有轮廓标注的随机文本
 - config/config.corpus.yml:  生成基于语料的，仅有文本标注的样本
-- config/config.captcha.yml: 生成仅包含数字和字母的用于验证码识别的样本
+- config/config.captcha.yml: 生成仅包含数字和字母的用于验证码识别的样本，当时长度固定
+- config/config.alphabeta.yml: 生成仅包含数字和字母，跟captcha验证码很像，但是长度不固定，用作英文+数字的样本
 
 你还可以根据给出的配置，微调你的生成参数。
 
-## 配置
+## 配置说明
 
 为了控制运行细节，需要配置[config.yml](config.yml)：
 
@@ -138,6 +145,13 @@ COMMON:
 
 以上配置都可以组合使用，更详细的配置，可直接参考配置文件中的注释。
 
+## 字符集
+
+目前提供3个字符集：
+- charset.txt   这个是一级字库和英文、数字和全角、半角标点符号
+- charset.4100.txt 在charset.txt的基础上，增加了一些地名、人名的常用字
+- charset.alphabeta.txt 仅包含数字和英文的字符集，用于制作验证码或者英文样本
+
 ## 相关资源
 
 **运行前，需要先下载背景（各类白纸）和字体资源**：
@@ -145,3 +159,10 @@ COMMON:
 [百度云盘下载](https://pan.baidu.com/s/1RU-JAnz7mP6w0REIXby0Zg)  提取码: 2rbd
 
 并放置到 data/目录下。
+
+# 其他说明
+
+- 背景都是白纸，为了增加样本真实性，如果不使用背景，默认会生成纯白色背景。
+- 字体同背景的作用，如果不提供，将使用系统默认字体
+- 字符串的长度、空格的多少等等，都可以通过修改配置文件达成，可以详细参考配置文件的注释
+- 目前不支持固定尺寸的图片生成，未来考虑增加这个特性

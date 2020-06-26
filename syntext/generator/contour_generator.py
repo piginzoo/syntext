@@ -43,8 +43,9 @@ class ContourGenerator(Generator):
 
             if char == " ": continue  # 空格不标注的
 
+            # 字符长度超过了bbox长度，有的bbox被忽略掉了，可能原因是bbox太小了
             if i > len(char_bboxes) - 1:
-                logger.warning("索引超过字符串bbox长度[%d]:%s", len(char_bboxes), text)
+                logger.warning("字符长度超过bbox长度[%d]:%s", len(char_bboxes), text)
                 return None
 
             pos = {

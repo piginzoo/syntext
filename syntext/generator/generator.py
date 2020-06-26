@@ -168,7 +168,7 @@ class Generator():
         while True:
             try:
 
-                if counter!=0 and counter % pbar_step ==0: pbar.update(1)
+                if counter!=0 and counter % pbar_step ==0: pbar.update(pbar_step)
 
                 data = queue.get()
                 image = data['image']
