@@ -1,0 +1,11 @@
+logs/
+syntext/test/debug
+data
+data/
+data/*
+.idea
+*.pyc
+*/*.pyc
+__pycache__
+model
+
